@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Investimenti</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+:root{--color-cream-50:rgba(252,252,249,1);--color-cream-100:rgba(255,255,253,1);--color-gray-200:rgba(245,245,245,1);--color-slate-500:rgba(98,108,113,1);--color-slate-900:rgba(19,52,59,1);--color-teal-500:rgba(33,128,141,1);--color-teal-600:rgba(29,116,128,1);--color-brown-600-rgb:94,82,64;--color-background:var(--color-cream-50);--color-surface:var(--color-cream-100);--color-text:var(--color-slate-900);--color-text-secondary:var(--color-slate-500);--color-primary:var(--color-teal-500);--color-primary-hover:var(--color-teal-600);--color-secondary:rgba(var(--color-brown-600-rgb),0.12);--color-border:rgba(var(--color-brown-600-rgb),0.2);--color-btn-primary-text:var(--color-cream-50);--color-card-border:rgba(var(--color-brown-600-rgb),0.12);--color-profit:#28a745;--color-loss:#dc3545;--font-size-xs:11px;--font-size-sm:12px;--font-size-base:14px;--font-size-lg:16px;--font-size-xl:18px;--font-size-2xl:20px;--font-size-3xl:24px;--space-4:4px;--space-8:8px;--space-12:12px;--space-16:16px;--space-20:20px;--space-24:24px;--radius-base:8px;--radius-lg:12px}
+html{font-size:14px;font-family:Arial,sans-serif;background:var(--color-background)}
+body{margin:0;padding:0;min-height:100vh}
+h1,h2,h3{margin:0;font-weight:600}
+h1{font-size:var(--font-size-3xl)}
+h2{font-size:var(--font-size-2xl)}
+h3{font-size:var(--font-size-xl)}
+.btn{display:inline-flex;align-items:center;padding:12px 16px;border-radius:8px;font-size:14px;cursor:pointer;border:none;min-height:44px}
+.btn--primary{background:var(--color-primary);color:white}
+.btn--primary:hover{background:var(--color-primary-hover)}
+.btn--secondary{background:var(--color-secondary);color:var(--color-text)}
+.btn--sm{padding:8px 12px;font-size:12px;min-height:36px}
+.btn--success{background:var(--color-profit);color:white}
+.btn--danger{background:var(--color-loss);color:white}
+.btn--full-width{width:100%}
+.form-control{width:100%;padding:12px;font-size:14px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px}
+.form-label{display:block;margin-bottom:8px;font-weight:500;font-size:12px}
+.form-group{margin-bottom:16px}
+.card{background:var(--color-surface);border-radius:12px;border:1px solid var(--color-card-border)}
+.card__body{padding:16px}
+.card__header{padding:16px;border-bottom:1px solid var(--color-card-border)}
+.app{min-height:100vh;display:flex;flex-direction:column;padding-bottom:80px}
+.header{background:var(--color-primary);color:white;padding:16px;text-align:center;position:sticky;top:0;z-index:1000}
+.header h1{color:white;margin-bottom:8px}
+.container{flex:1;padding:16px}
+.summary-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.summary-card{background:var(--color-surface);padding:16px;border-radius:12px;border:1px solid var(--color-card-border);text-align:center}
+.summary-card h3{font-size:12px;color:var(--color-text-secondary);margin-bottom:8px}
+.summary-card .value{font-size:18px;font-weight:bold}
+.profit{color:var(--color-profit)}
+.loss{color:var(--color-loss)}
+.investments-table{background:var(--color-surface);border-radius:12px;border:1px solid var(--color-card-border)}
+.table-header{padding:16px;display:flex;justify-content:space-between;border-bottom:1px solid var(--color-card-border)}
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-btn{padding:6px 12px;border:1px solid var(--color-border);background:var(--color-surface);border-radius:8px;font-size:12px;cursor:pointer}
+.filter-btn.active{background:var(--color-primary);color:white;border-color:var(--color-primary)}
+.investment-item{padding:16px;border-bottom:1px solid var(--color-card-border)}
+.investment-header{display:flex;justify-content:space-between;margin-bottom:8px}
+.investment-title{font-weight:600;font-size:14px}
+.investment-type{padding:4px 8px;border-radius:6px;font-size:11px;background:rgba(100,150,200,0.1)}
+.investment-details{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--color-text-secondary);margin-bottom:8px}
+.investment-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--color-surface);border-top:1px solid var(--color-card-border);display:flex;justify-content:space-around;padding:12px 8px;z-index:1000}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:var(--color-text-secondary);cursor:pointer;padding:8px;min-width:60px;font-size:10px}
+.nav-btn.active{color:var(--color-primary)}
+.nav-icon{width:24px;height:24px}
+.nav-label{font-size:10px}
+.page{display:none}
+.page.active{display:block}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;padding:16px}
+.modal.active{display:flex}
+.modal-content{background:var(--color-surface);border-radius:12px;padding:24px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto}
+.modal-header{display:flex;justify-content:space-between;margin-bottom:20px}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--color-text-secondary)}
+.text-center{text-align:center}
+.text-sm{font-size:12px}
+.text-xs{font-size:11px}
+.mb-16{margin-bottom:16px}
+.flex{display:flex}
+.gap-8{gap:8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-container{position:relative;height:300px;margin-bottom:24px}
+@media (max-width:640px){.form-row,.summary-cards{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>💰 Portfolio Investimenti</h1>
+            <div class="text-xs">Gestione completa con grafici</div>
+        </header>
+
+        <div class="page active" id="dashboardPage">
+            <div class="container">
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <h3>Valore Totale</h3>
+                        <div class="value" id="totalValue">€0,00</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Guadagno/Perdita</h3>
+                        <div class="value profit" id="totalGainLoss">+€0,00</div>
+                    </div>
+                </div>
+
+                <div class="text-center mb-16">
+                    <button class="btn btn--primary" onclick="updatePrices()" id="updateBtn">🔄 Aggiorna Prezzi</button>
+                </div>
+
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterInvestments('all')">Tutti</button>
+                    <button class="filter-btn" onclick="filterInvestments('Azioni')">Azioni</button>
+                    <button class="filter-btn" onclick="filterInvestments('ETF')">ETF</button>
+                    <button class="filter-btn" onclick="filterInvestments('Obbligazioni')">Obbligazioni</button>
+                    <button class="filter-btn" onclick="filterInvestments('Conto Deposito')">Depositi</button>
+                </div>
+
+                <div class="investments-table">
+                    <div class="table-header">
+                        <h3>I Tuoi Investimenti</h3>
+                        <span class="text-sm" id="investmentsCount">0 titoli</span>
+                    </div>
+                    <div id="investmentsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="managePage">
+            <div class="container">
+                <h2 class="mb-16">Gestisci Investimenti</h2>
+                <div class="card mb-16">
+                    <div class="card__body">
+                        <h3 class="mb-16">Aggiungi Investimento</h3>
+                        <form id="addForm">
+                            <div class="form-group">
+                                <label class="form-label">Tipologia</label>
+                                <select class="form-control" id="newType" required>
+                                    <option value="Azioni">Azioni</option>
+                                    <option value="ETF">ETF</option>
+                                    <option value="Obbligazioni">Obbligazioni</option>
+                                    <option value="Conto Deposito">Conto Deposito</option>
+                                </select>
+                            </div>
+                            
+                            <div id="securitiesFields">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Nome</label>
+                                        <input type="text" class="form-control" id="newName">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Symbol</label>
+                                        <input type="text" class="form-control" id="newSymbol" placeholder="UCG.MI">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Quantità</label>
+                                        <input type="number" class="form-control" id="newQty" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Prezzo (€)</label>
+                                        <input type="number" class="form-control" id="newPrice" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Data Acquisto</label>
+                                    <input type="date" class="form-control" id="newDate" required>
+                                </div>
+                            </div>
+                            
+                            <div id="bondsFields" style="display:none">
+                                <div class="form-group">
+                                    <label class="form-label">Nome Obbligazione</label>
+                                    <input type="text" class="form-control" id="newBondName">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Importo (€)</label>
+                                        <input type="number" class="form-control" id="newBondAmount" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Tasso (%)</label>
+                                        <input type="number" class="form-control" id="newBondRate" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Data Acquisto</label>
+                                    <input type="date" class="form-control" id="newBondDate">
+                                </div>
+                            </div>
+                            
+                            <div id="depositFields" style="display:none">
+                                <div class="form-group">
+                                    <label class="form-label">Nome Istituto</label>
+                                    <input type="text" class="form-control" id="newBankName">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Importo (€)</label>
+                                        <input type="number" class="form-control" id="newAmount" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Tasso (%)</label>
+                                        <input type="number" class="form-control" id="newRate" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Data</label>
+                                    <input type="date" class="form-control" id="newDepositDate">
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn--primary btn--full-width">Aggiungi</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="investments-table">
+                    <div class="table-header"><h3>Investimenti</h3></div>
+                    <div id="manageList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="chartsPage">
+            <div class="container">
+                <h2 class="mb-16">📊 Grafici Portfolio</h2>
+                
+                <div class="card mb-16">
+                    <div class="card__header"><h3>Composizione per Tipologia</h3></div>
+                    <div class="card__body">
+                        <div class="chart-container">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-16">
+                    <div class="card__header"><h3>Valore per Investimento</h3></div>
+                    <div class="card__body">
+                        <div class="chart-container">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-16">
+                    <div class="card__header"><h3>Performance (%)</h3></div>
+                    <div class="card__body">
+                        <div class="chart-container">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="historyPage">
+            <div class="container">
+                <h2 class="mb-16">Storico Vendite</h2>
+                <div id="historyList"></div>
+            </div>
+        </div>
+
+        <div class="page" id="analysisPage">
+            <div class="container">
+                <h2 class="mb-16">📊 Analisi</h2>
+                <div id="analysisContent"></div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="showPage('dashboard')">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                <span class="nav-label">Home</span>
+            </button>
+            <button class="nav-btn" onclick="showPage('manage')">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                <span class="nav-label">Gestisci</span>
+            </button>
+            <button class="nav-btn" onclick="showPage('charts')">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+                <span class="nav-label">Grafici</span>
+            </button>
+            <button class="nav-btn" onclick="showPage('history')">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                <span class="nav-label">Storico</span>
+            </button>
+            <button class="nav-btn" onclick="showPage('analysis')">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+                <span class="nav-label">Analisi</span>
+            </button>
+        </nav>
+
+        <div class="modal" id="editModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Modifica</h3>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div id="editBody"></div>
+            </div>
+        </div>
+
+        <div class="modal" id="sellModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Vendi</h3>
+                    <button class="modal-close" onclick="closeSellModal()">&times;</button>
+                </div>
+                <div id="sellBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+const API_KEY='YZ2LIXW0H2RZXNEL';
+let investments=[
+    {id:1,nome:"UniCredit",symbol:"UCG.MI",tipologia:"Azioni",prezzo_acquisto:22.80,prezzo_attuale:25.40,quantità:200,data_acquisto:"2024-01-15"},
+    {id:2,nome:"Enel",symbol:"ENEL.MI",tipologia:"Azioni",prezzo_acquisto:6.85,prezzo_attuale:6.20,quantità:500,data_acquisto:"2024-03-20"},
+    {id:3,nome:"Apple",symbol:"AAPL",tipologia:"Azioni",prezzo_acquisto:150.00,prezzo_attuale:175.50,quantità:50,data_acquisto:"2024-05-10"}
+];
+let salesHistory=[];
+let currentFilter='all';
+let nextId=4;
+let charts={};
+
+function salvaInvestimenti(){
+try{
+localStorage.setItem('portfolioInvestimenti',JSON.stringify(investments));
+localStorage.setItem('portfolioStoricoVendite',JSON.stringify(salesHistory));
+return true;
+}catch(e){
+console.error('Errore salvataggio:',e);
+return false;
+}
+}
+
+function caricaInvestimenti(){
+try{
+const inv=localStorage.getItem('portfolioInvestimenti');
+const sales=localStorage.getItem('portfolioStoricoVendite');
+if(inv)investments=JSON.parse(inv);
+if(sales)salesHistory=JSON.parse(sales);
+}catch(e){
+console.error('Errore caricamento:',e);
+}
+}
+
+function formatCurrency(amount){
+return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(amount);
+}
+
+function formatPercent(percent){
+const sign=percent>=0?'+':'';
+return `${sign}${percent.toFixed(2)}%`;
+}
+
+function calculateData(inv){
+if(inv.tipologia==='Conto Deposito'||inv.tipologia==='Obbligazioni'){
+const startDate=new Date(inv.data_acquisto);
+const today=new Date();
+const daysDiff=Math.floor((today-startDate)/(1000*60*60*24));
+const dailyRate=inv.tasso_annuo/100/365;
+const compoundValue=inv.importo_iniziale*Math.pow(1+dailyRate,daysDiff);
+const valAcq=inv.importo_iniziale;
+const valAtt=Math.round(compoundValue*100)/100;
+const gain=valAtt-valAcq;
+const perc=(gain/valAcq)*100;
+inv.prezzo_attuale=valAtt;
+return {valoreAcquisto:valAcq,valoreAttuale:valAtt,guadagnoPerdita:gain,percentuale:perc};
+}
+const valAcq=inv.prezzo_acquisto*inv.quantità;
+const valAtt=inv.prezzo_attuale*inv.quantità;
+const gain=valAtt-valAcq;
+const perc=(gain/valAcq)*100;
+return {valoreAcquisto:valAcq,valoreAttuale:valAtt,guadagnoPerdita:gain,percentuale:perc};
+}
+
+function updateSummary(){
+const totals=investments.reduce((acc,inv)=>{
+const d=calculateData(inv);
+acc.valAcq+=d.valoreAcquisto;
+acc.valAtt+=d.valoreAttuale;
+acc.gain+=d.guadagnoPerdita;
+return acc;
+},{valAcq:0,valAtt:0,gain:0});
+const perc=totals.valAcq>0?(totals.gain/totals.valAcq)*100:0;
+document.getElementById('totalValue').textContent=formatCurrency(totals.valAtt);
+const el=document.getElementById('totalGainLoss');
+el.textContent=`${formatCurrency(totals.gain)} (${formatPercent(perc)})`;
+el.className=`value ${totals.gain>=0?'profit':'loss'}`;
+document.getElementById('investmentsCount').textContent=`${investments.length} titoli`;
+}
+
+function renderInvestments(){
+const container=document.getElementById('investmentsList');
+const filtered=currentFilter==='all'?investments:investments.filter(i=>i.tipologia===currentFilter);
+if(filtered.length===0){
+container.innerHTML='<div class="investment-item text-center"><p class="text-sm">Nessun investimento</p></div>';
+return;
+}
+container.innerHTML=filtered.map(inv=>{
+const d=calculateData(inv);
+const cls=d.guadagnoPerdita>=0?'profit':'loss';
+const sign=d.guadagnoPerdita>=0?'+':'';
+return`
+<div class="investment-item">
+<div class="investment-header">
+<div>
+<div class="investment-title">📈 ${inv.nome}</div>
+<div class="investment-type">${inv.tipologia}</div>
+</div>
+</div>
+<div class="investment-details">
+<div><strong>Data:</strong> ${inv.data_acquisto?new Date(inv.data_acquisto).toLocaleDateString('it-IT'):'N/A'}</div>
+${inv.tipologia==='Conto Deposito'||inv.tipologia==='Obbligazioni'
+?`<div><strong>Tasso:</strong> ${inv.tasso_annuo}%</div>
+<div><strong>Importo:</strong> ${formatCurrency(inv.importo_iniziale)}</div>
+<div><strong>Valore:</strong> ${formatCurrency(d.valoreAttuale)}</div>`
+:`<div><strong>Symbol:</strong> ${inv.symbol||'N/A'}</div>
+<div><strong>Qtà:</strong> ${inv.quantità}</div>
+<div><strong>Prezzo:</strong> ${formatCurrency(inv.prezzo_attuale)}</div>`
+}
+</div>
+<div class="investment-performance">
+<div class="${cls}" style="font-weight:bold;font-size:16px;">
+${formatCurrency(d.valoreAttuale)}
+</div>
+<div class="${cls}" style="font-size:12px;">
+${sign}${formatCurrency(d.guadagnoPerdita)} (${formatPercent(d.percentuale)})
+</div>
+</div>
+</div>
+`;
+}).join('');
+}
+
+function renderManage(){
+const container=document.getElementById('manageList');
+if(investments.length===0){
+container.innerHTML='<div class="investment-item text-center"><p class="text-sm">Nessun investimento</p></div>';
+return;
+}
+container.innerHTML=investments.map(inv=>{
+const d=calculateData(inv);
+const cls=d.guadagnoPerdita>=0?'profit':'loss';
+return`
+<div class="investment-item">
+<div class="investment-header">
+<div>
+<div class="investment-title">${inv.nome}</div>
+<div class="text-sm">${inv.tipologia}</div>
+</div>
+<div class="${cls}" style="font-weight:bold;">
+${formatCurrency(d.valoreAttuale)}
+</div>
+</div>
+<div class="investment-actions">
+<button class="btn btn--secondary btn--sm" onclick="editQty(${inv.id})">✏️</button>
+<button class="btn btn--danger btn--sm" onclick="sellInv(${inv.id})">💸</button>
+<button class="btn btn--danger btn--sm" onclick="deleteInv(${inv.id})">🗑️</button>
+</div>
+</div>
+`;
+}).join('');
+}
+
+function renderHistory(){
+const container=document.getElementById('historyList');
+if(salesHistory.length===0){
+container.innerHTML='<div class="card"><div class="card__body text-center"><p>Nessuna vendita</p></div></div>';
+return;
+}
+const totals=salesHistory.reduce((acc,s)=>{
+acc.total+=s.guadagno;
+if(s.guadagno>0)acc.gains+=s.guadagno;
+else acc.losses+=Math.abs(s.guadagno);
+return acc;
+},{total:0,gains:0,losses:0});
+container.innerHTML=`
+<div class="card mb-16">
+<div class="card__header"><h3>Riepilogo</h3></div>
+<div class="card__body">
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;text-align:center;">
+<div><div class="text-sm">Vendite</div><div style="font-weight:bold;">${salesHistory.length}</div></div>
+<div><div class="text-sm">Guadagni</div><div class="profit" style="font-weight:bold;">+${formatCurrency(totals.gains)}</div></div>
+<div><div class="text-sm">Perdite</div><div class="loss" style="font-weight:bold;">-${formatCurrency(totals.losses)}</div></div>
+</div>
+</div>
+</div>
+${salesHistory.map(s=>{
+const cls=s.guadagno>=0?'profit':'loss';
+return`<div class="card mb-16"><div class="card__body"><div style="display:flex;justify-content:space-between;"><div><div style="font-weight:bold;">${s.nome}</div><div class="text-sm">${s.data}</div></div><div class="${cls}" style="font-weight:bold;">${formatCurrency(s.guadagno)}</div></div></div></div>`;
+}).join('')}
+`;
+}
+
+function renderAnalysis(){
+const container=document.getElementById('analysisContent');
+if(investments.length===0){
+container.innerHTML='<div class="card"><div class="card__body text-center"><p>Nessun investimento</p></div></div>';
+return;
+}
+const totals=investments.reduce((acc,inv)=>{
+const d=calculateData(inv);
+acc.valAtt+=d.valoreAttuale;
+acc.valAcq+=d.valoreAcquisto;
+acc.gain+=d.guadagnoPerdita;
+return acc;
+},{valAtt:0,valAcq:0,gain:0});
+const percTotale=(totals.gain/totals.valAcq*100).toFixed(2);
+const byType={};
+investments.forEach(inv=>{
+const d=calculateData(inv);
+if(!byType[inv.tipologia])byType[inv.tipologia]={valore:0,count:0};
+byType[inv.tipologia].valore+=d.valoreAttuale;
+byType[inv.tipologia].count++;
+});
+const sorted=investments.map(inv=>({inv,data:calculateData(inv)})).sort((a,b)=>b.data.percentuale-a.data.percentuale);
+const topPerformer=sorted[0];
+const worstPerformer=sorted[sorted.length-1];
+container.innerHTML=`
+<div class="card mb-16">
+<div class="card__header"><h3>💼 Riepilogo</h3></div>
+<div class="card__body">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+<div><div class="text-sm">Valore</div><div style="font-size:20px;font-weight:bold;">${formatCurrency(totals.valAtt)}</div></div>
+<div><div class="text-sm">Performance</div><div style="font-size:20px;font-weight:bold;" class="${totals.gain>=0?'profit':'loss'}">${formatCurrency(totals.gain)} (${percTotale}%)</div></div>
+</div>
+</div>
+</div>
+<div class="card mb-16">
+<div class="card__header"><h3>📈 Composizione</h3></div>
+<div class="card__body">
+${Object.entries(byType).map(([tipo,data])=>{
+const perc=(data.valore/totals.valAtt*100).toFixed(1);
+return`<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span><strong>${tipo}</strong> (${data.count})</span><span>${formatCurrency(data.valore)} (${perc}%)</span></div><div style="background:#e0e0e0;height:8px;border-radius:4px;"><div style="background:var(--color-primary);height:100%;width:${perc}%;border-radius:4px;"></div></div></div>`;
+}).join('')}
+</div>
+</div>
+<div class="card mb-16">
+<div class="card__header"><h3>🏆 Top</h3></div>
+<div class="card__body">
+<div style="display:flex;justify-content:space-between;">
+<span>${topPerformer.inv.nome}</span>
+<span class="profit" style="font-weight:bold;">${formatPercent(topPerformer.data.percentuale)}</span>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card__header"><h3>⚠️ Worst</h3></div>
+<div class="card__body">
+<div style="display:flex;justify-content:space-between;">
+<span>${worstPerformer.inv.nome}</span>
+<span class="loss" style="font-weight:bold;">${formatPercent(worstPerformer.data.percentuale)}</span>
+</div>
+</div>
+</div>
+`;
+}
+
+function renderCharts(){
+if(investments.length===0)return;
+
+const byType={};
+investments.forEach(inv=>{
+const d=calculateData(inv);
+if(!byType[inv.tipologia])byType[inv.tipologia]=0;
+byType[inv.tipologia]+=d.valoreAttuale;
+});
+
+const colors=['#21808d','#32b8c6','#5e5240','#626c71'];
+
+if(charts.pie)charts.pie.destroy();
+const pieCtx=document.getElementById('pieChart');
+if(pieCtx){
+charts.pie=new Chart(pieCtx,{
+type:'pie',
+data:{
+labels:Object.keys(byType),
+datasets:[{
+data:Object.values(byType),
+backgroundColor:colors
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{
+legend:{position:'bottom'}
+}
+}
+});
+}
+
+if(charts.bar)charts.bar.destroy();
+const barCtx=document.getElementById('barChart');
+if(barCtx){
+const invData=investments.map(inv=>{
+const d=calculateData(inv);
+return {nome:inv.nome,valore:d.valoreAttuale};
+}).sort((a,b)=>b.valore-a.valore).slice(0,10);
+
+charts.bar=new Chart(barCtx,{
+type:'bar',
+data:{
+labels:invData.map(i=>i.nome),
+datasets:[{
+label:'Valore (€)',
+data:invData.map(i=>i.valore),
+backgroundColor:'#21808d'
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{legend:{display:false}}
+}
+});
+}
+
+if(charts.perf)charts.perf.destroy();
+const perfCtx=document.getElementById('performanceChart');
+if(perfCtx){
+const perfData=investments.map(inv=>{
+const d=calculateData(inv);
+return {nome:inv.nome,perc:d.percentuale};
+}).sort((a,b)=>b.perc-a.perc);
+
+charts.perf=new Chart(perfCtx,{
+type:'bar',
+data:{
+labels:perfData.map(i=>i.nome),
+datasets:[{
+label:'Performance (%)',
+data:perfData.map(i=>i.perc),
+backgroundColor:perfData.map(i=>i.perc>=0?'#28a745':'#dc3545')
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{legend:{display:false}}
+}
+});
+}
+}
+
+function showPage(pageId){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById(pageId+'Page').classList.add('active');
+document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+event.target.closest('.nav-btn').classList.add('active');
+if(pageId==='dashboard'){updateSummary();renderInvestments();}
+else if(pageId==='manage'){renderManage();}
+else if(pageId==='charts'){renderCharts();}
+else if(pageId==='history'){renderHistory();}
+else if(pageId==='analysis'){renderAnalysis();}
+}
+
+function filterInvestments(type){
+currentFilter=type;
+document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+event.target.classList.add('active');
+renderInvestments();
+}
+
+async function updatePrices(){
+const btn=document.getElementById('updateBtn');
+btn.disabled=true;
+btn.innerHTML='⏳ Aggiornamento...';
+let updated=0;
+let errors=0;
+for(let inv of investments){
+if(inv.tipologia==='Conto Deposito'||inv.tipologia==='Obbligazioni'){
+calculateData(inv);
+updated++;
+continue;
+}
+if(!inv.symbol||inv.symbol==='N/A'){
+errors++;
+continue;
+}
+try{
+const url=`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${inv.symbol}&apikey=${API_KEY}`;
+const res=await fetch(url);
+const data=await res.json();
+if(data['Global Quote']&&data['Global Quote']['05. price']){
+inv.prezzo_attuale=parseFloat(data['Global Quote']['05. price']);
+updated++;
+}else{
+errors++;
+}
+await new Promise(r=>setTimeout(r,12000));
+}catch(e){
+errors++;
+}
+}
+salvaInvestimenti();
+updateSummary();
+renderInvestments();
+renderManage();
+btn.disabled=false;
+btn.innerHTML='🔄 Aggiorna Prezzi';
+if(updated>0)alert(`✅ ${updated} aggiornati`);
+if(errors>0)alert(`⚠️ ${errors} errori`);
+}
+
+function editQty(id){
+const inv=investments.find(i=>i.id===id);
+if(!inv)return;
+document.getElementById('editBody').innerHTML=`
+<div class="mb-16"><h4>${inv.nome}</h4><p class="text-sm">Qtà: ${inv.quantità}</p></div>
+<form id="editForm">
+<div class="form-group">
+<label class="form-label">Nuova Quantità</label>
+<input type="number" class="form-control" id="editQty" value="${inv.quantità}" min="0.01" step="0.01" required>
+</div>
+<div class="flex gap-8">
+<button type="button" class="btn btn--secondary" onclick="closeModal()">Annulla</button>
+<button type="submit" class="btn btn--success">Salva</button>
+</div>
+</form>
+`;
+document.getElementById('editModal').classList.add('active');
+document.getElementById('editForm').onsubmit=function(e){
+e.preventDefault();
+const newQty=parseFloat(document.getElementById('editQty').value);
+if(newQty>0){
+inv.quantità=newQty;
+salvaInvestimenti();
+renderManage();
+updateSummary();
+renderInvestments();
+closeModal();
+alert('OK!');
+}
+};
+}
+
+function closeModal(){
+document.getElementById('editModal').classList.remove('active');
+}
+
+function sellInv(id){
+const inv=investments.find(i=>i.id===id);
+if(!inv)return;
+document.getElementById('sellBody').innerHTML=`
+<div class="mb-16"><h4>${inv.nome}</h4></div>
+<form id="sellForm">
+<div class="form-group">
+<label class="form-label">Quantità</label>
+<input type="number" class="form-control" id="sellQty" min="0.01" max="${inv.quantità}" step="0.01" required>
+</div>
+<div class="form-group">
+<label class="form-label">Prezzo (€)</label>
+<input type="number" class="form-control" id="sellPrice" value="${inv.prezzo_attuale}" step="0.01" required>
+</div>
+<div class="flex gap-8">
+<button type="button" class="btn btn--secondary" onclick="closeSellModal()">Annulla</button>
+<button type="submit" class="btn btn--danger">Vendi</button>
+</div>
+</form>
+`;
+document.getElementById('sellModal').classList.add('active');
+document.getElementById('sellForm').onsubmit=function(e){
+e.preventDefault();
+const qty=parseFloat(document.getElementById('sellQty').value);
+const price=parseFloat(document.getElementById('sellPrice').value);
+if(qty>0&&qty<=inv.quantità&&price>0){
+const gain=(price-inv.prezzo_acquisto)*qty;
+salesHistory.unshift({
+nome:inv.nome,
+quantita:qty,
+guadagno:gain,
+data:new Date().toLocaleDateString('it-IT')
+});
+if(qty>=inv.quantità){
+investments=investments.filter(i=>i.id!==id);
+}else{
+inv.quantità-=qty;
+}
+salvaInvestimenti();
+renderManage();
+updateSummary();
+renderInvestments();
+renderHistory();
+closeSellModal();
+alert('OK!');
+}
+};
+}
+
+function closeSellModal(){
+document.getElementById('sellModal').classList.remove('active');
+}
+
+function deleteInv(id){
+const inv=investments.find(i=>i.id===id);
+if(!inv)return;
+if(confirm(`Eliminare ${inv.nome}?`)){
+investments=investments.filter(i=>i.id!==id);
+salvaInvestimenti();
+renderManage();
+updateSummary();
+renderInvestments();
+alert('Eliminato!');
+}
+}
+
+document.getElementById('newType').onchange=function(){
+const type=this.value;
+document.getElementById('securitiesFields').style.display='none';
+document.getElementById('bondsFields').style.display='none';
+document.getElementById('depositFields').style.display='none';
+if(type==='Conto Deposito'){
+document.getElementById('depositFields').style.display='block';
+}else if(type==='Obbligazioni'){
+document.getElementById('bondsFields').style.display='block';
+}else{
+document.getElementById('securitiesFields').style.display='block';
+}
+};
+
+document.getElementById('addForm').onsubmit=function(e){
+e.preventDefault();
+const tipo=document.getElementById('newType').value;
+if(tipo==='Conto Deposito'){
+const importo=parseFloat(document.getElementById('newAmount').value);
+investments.push({
+id:nextId++,
+nome:document.getElementById('newBankName').value,
+tipologia:"Conto Deposito",
+importo_iniziale:importo,
+tasso_annuo:parseFloat(document.getElementById('newRate').value),
+prezzo_acquisto:importo,
+prezzo_attuale:importo,
+quantità:1,
+symbol:'N/A',
+data_acquisto:document.getElementById('newDepositDate').value
+});
+}else if(tipo==='Obbligazioni'){
+const importo=parseFloat(document.getElementById('newBondAmount').value);
+investments.push({
+id:nextId++,
+nome:document.getElementById('newBondName').value,
+tipologia:"Obbligazioni",
+importo_iniziale:importo,
+tasso_annuo:parseFloat(document.getElementById('newBondRate').value),
+prezzo_acquisto:importo,
+prezzo_attuale:importo,
+quantità:1,
+symbol:'N/A',
+data_acquisto:document.getElementById('newBondDate').value
+});
+}else{
+investments.push({
+id:nextId++,
+nome:document.getElementById('newName').value,
+symbol:document.getElementById('newSymbol').value||'N/A',
+tipologia:tipo,
+prezzo_acquisto:parseFloat(document.getElementById('newPrice').value),
+prezzo_attuale:parseFloat(document.getElementById('newPrice').value),
+quantità:parseFloat(document.getElementById('newQty').value),
+data_acquisto:document.getElementById('newDate').value
+});
+}
+salvaInvestimenti();
+this.reset();
+const today=new Date().toISOString().split('T')[0];
+document.getElementById('newDate').value=today;
+document.getElementById('newBondDate').value=today;
+document.getElementById('newDepositDate').value=today;
+document.getElementById('securitiesFields').style.display='block';
+document.getElementById('bondsFields').style.display='none';
+document.getElementById('depositFields').style.display='none';
+renderManage();
+updateSummary();
+renderInvestments();
+alert('Aggiunto!');
+};
+
+document.addEventListener('DOMContentLoaded',function(){
+const today=new Date().toISOString().split('T')[0];
+document.getElementById('newDate').value=today;
+document.getElementById('newBondDate').value=today;
+document.getElementById('newDepositDate').value=today;
+caricaInvestimenti();
+updateSummary();
+renderInvestments();
+renderManage();
+renderHistory();
+console.log('✅ App caricata');
+});
+    </script>
+</body>
+</html>
