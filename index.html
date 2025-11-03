@@ -75,7 +75,7 @@ h3{font-size:var(--font-size-xl)}
     <div class="app">
         <header class="header">
             <h1>💰 Portfolio Investimenti</h1>
-            <div class="text-xs">Gestione completa con grafici</div>
+            <div class="text-xs">Con conversione automatica USD→EUR</div>
         </header>
 
         <div class="page active" id="dashboardPage">
@@ -93,6 +93,9 @@ h3{font-size:var(--font-size-xl)}
 
                 <div class="text-center mb-16">
                     <button class="btn btn--primary" onclick="updatePrices()" id="updateBtn">🔄 Aggiorna Prezzi</button>
+                    <div class="text-xs" style="margin-top:8px;opacity:0.7;">
+                        💡 Conversione automatica USD→EUR
+                    </div>
                 </div>
 
                 <div class="filters">
@@ -138,7 +141,7 @@ h3{font-size:var(--font-size-xl)}
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Symbol</label>
-                                        <input type="text" class="form-control" id="newSymbol" placeholder="UCG.MI">
+                                        <input type="text" class="form-control" id="newSymbol" placeholder="UCG.MI o AAPL">
                                     </div>
                                 </div>
                                 <div class="form-row">
@@ -365,6 +368,20 @@ const perc=(gain/valAcq)*100;
 return {valoreAcquisto:valAcq,valoreAttuale:valAtt,guadagnoPerdita:gain,percentuale:perc};
 }
 
+async function getUSDtoEURExchangeRate(){
+const url=`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=EUR&apikey=${API_KEY}`;
+try{
+const res=await fetch(url);
+const data=await res.json();
+if(data['Realtime Currency Exchange Rate']&&data['Realtime Currency Exchange Rate']['5. Exchange Rate']){
+return parseFloat(data['Realtime Currency Exchange Rate']['5. Exchange Rate']);
+}
+}catch(e){
+console.error('Errore cambio valuta',e);
+}
+return null;
+}
+
 function updateSummary(){
 const totals=investments.reduce((acc,inv)=>{
 const d=calculateData(inv);
@@ -550,16 +567,13 @@ return`<div style="margin-bottom:12px;"><div style="display:flex;justify-content
 
 function renderCharts(){
 if(investments.length===0)return;
-
 const byType={};
 investments.forEach(inv=>{
 const d=calculateData(inv);
 if(!byType[inv.tipologia])byType[inv.tipologia]=0;
 byType[inv.tipologia]+=d.valoreAttuale;
 });
-
 const colors=['#21808d','#32b8c6','#5e5240','#626c71'];
-
 if(charts.pie)charts.pie.destroy();
 const pieCtx=document.getElementById('pieChart');
 if(pieCtx){
@@ -575,13 +589,10 @@ backgroundColor:colors
 options:{
 responsive:true,
 maintainAspectRatio:false,
-plugins:{
-legend:{position:'bottom'}
-}
+plugins:{legend:{position:'bottom'}}
 }
 });
 }
-
 if(charts.bar)charts.bar.destroy();
 const barCtx=document.getElementById('barChart');
 if(barCtx){
@@ -589,7 +600,6 @@ const invData=investments.map(inv=>{
 const d=calculateData(inv);
 return {nome:inv.nome,valore:d.valoreAttuale};
 }).sort((a,b)=>b.valore-a.valore).slice(0,10);
-
 charts.bar=new Chart(barCtx,{
 type:'bar',
 data:{
@@ -607,7 +617,6 @@ plugins:{legend:{display:false}}
 }
 });
 }
-
 if(charts.perf)charts.perf.destroy();
 const perfCtx=document.getElementById('performanceChart');
 if(perfCtx){
@@ -615,7 +624,6 @@ const perfData=investments.map(inv=>{
 const d=calculateData(inv);
 return {nome:inv.nome,perc:d.percentuale};
 }).sort((a,b)=>b.perc-a.perc);
-
 charts.perf=new Chart(perfCtx,{
 type:'bar',
 data:{
@@ -660,6 +668,9 @@ btn.disabled=true;
 btn.innerHTML='⏳ Aggiornamento...';
 let updated=0;
 let errors=0;
+
+const usdToEurRate=await getUSDtoEURExchangeRate();
+
 for(let inv of investments){
 if(inv.tipologia==='Conto Deposito'||inv.tipologia==='Obbligazioni'){
 calculateData(inv);
@@ -675,7 +686,13 @@ const url=`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${inv.
 const res=await fetch(url);
 const data=await res.json();
 if(data['Global Quote']&&data['Global Quote']['05. price']){
-inv.prezzo_attuale=parseFloat(data['Global Quote']['05. price']);
+let price=parseFloat(data['Global Quote']['05. price']);
+
+if(usdToEurRate&&!inv.symbol.toUpperCase().endsWith('.MI')){
+price=price*usdToEurRate;
+}
+
+inv.prezzo_attuale=Math.round(price*100)/100;
 updated++;
 }else{
 errors++;
@@ -685,6 +702,7 @@ await new Promise(r=>setTimeout(r,12000));
 errors++;
 }
 }
+
 salvaInvestimenti();
 updateSummary();
 renderInvestments();
@@ -879,7 +897,7 @@ updateSummary();
 renderInvestments();
 renderManage();
 renderHistory();
-console.log('✅ App caricata');
+console.log('✅ App con conversione USD→EUR attiva');
 });
     </script>
 </body>
