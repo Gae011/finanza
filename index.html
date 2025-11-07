@@ -21,7 +21,7 @@ h3{font-size:var(--font-size-xl)}
 .btn--success{background:var(--color-profit);color:white}
 .btn--danger{background:var(--color-loss);color:white}
 .btn--full-width{width:100%}
-.form-control{width:100%;padding:12px;font-size:14px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px}
+.form-control{width:100%;padding:12px;font-size:14px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;box-sizing:border-box}
 .form-label{display:block;margin-bottom:8px;font-weight:500;font-size:12px}
 .form-group{margin-bottom:16px}
 .card{background:var(--color-surface);border-radius:12px;border:1px solid var(--color-card-border)}
@@ -75,7 +75,7 @@ h3{font-size:var(--font-size-xl)}
     <div class="app">
         <header class="header">
             <h1>💰 Portfolio Investimenti</h1>
-            <div class="text-xs">Con conversione automatica USD→EUR</div>
+            <div class="text-xs">Conversione intelligente valute</div>
         </header>
 
         <div class="page active" id="dashboardPage">
@@ -94,7 +94,7 @@ h3{font-size:var(--font-size-xl)}
                 <div class="text-center mb-16">
                     <button class="btn btn--primary" onclick="updatePrices()" id="updateBtn">🔄 Aggiorna Prezzi</button>
                     <div class="text-xs" style="margin-top:8px;opacity:0.7;">
-                        💡 Conversione automatica USD→EUR
+                        💡 Conversione automatica solo per titoli non-EUR
                     </div>
                 </div>
 
@@ -140,8 +140,8 @@ h3{font-size:var(--font-size-xl)}
                                         <input type="text" class="form-control" id="newName">
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Symbol</label>
-                                        <input type="text" class="form-control" id="newSymbol" placeholder="UCG.MI o AAPL">
+                                        <label class="form-label">Symbol (es: AAPL, UCG.MI)</label>
+                                        <input type="text" class="form-control" id="newSymbol" placeholder="UCG.MI">
                                     </div>
                                 </div>
                                 <div class="form-row">
@@ -150,7 +150,7 @@ h3{font-size:var(--font-size-xl)}
                                         <input type="number" class="form-control" id="newQty" step="0.01">
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Prezzo (€)</label>
+                                        <label class="form-label">Prezzo Acquisto (€)</label>
                                         <input type="number" class="form-control" id="newPrice" step="0.01">
                                     </div>
                                 </div>
@@ -167,11 +167,11 @@ h3{font-size:var(--font-size-xl)}
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label class="form-label">Importo (€)</label>
+                                        <label class="form-label">Importo Investito (€)</label>
                                         <input type="number" class="form-control" id="newBondAmount" step="0.01">
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Tasso (%)</label>
+                                        <label class="form-label">Tasso Annuo (%)</label>
                                         <input type="number" class="form-control" id="newBondRate" step="0.01">
                                     </div>
                                 </div>
@@ -192,12 +192,12 @@ h3{font-size:var(--font-size-xl)}
                                         <input type="number" class="form-control" id="newAmount" step="0.01">
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Tasso (%)</label>
+                                        <label class="form-label">Tasso Annuo (%)</label>
                                         <input type="number" class="form-control" id="newRate" step="0.01">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Data</label>
+                                    <label class="form-label">Data Apertura</label>
                                     <input type="date" class="form-control" id="newDepositDate">
                                 </div>
                             </div>
@@ -207,7 +207,7 @@ h3{font-size:var(--font-size-xl)}
                     </div>
                 </div>
                 <div class="investments-table">
-                    <div class="table-header"><h3>Investimenti</h3></div>
+                    <div class="table-header"><h3>Investimenti Attuali</h3></div>
                     <div id="manageList"></div>
                 </div>
             </div>
@@ -255,7 +255,7 @@ h3{font-size:var(--font-size-xl)}
 
         <div class="page" id="analysisPage">
             <div class="container">
-                <h2 class="mb-16">📊 Analisi</h2>
+                <h2 class="mb-16">📊 Analisi Portfolio</h2>
                 <div id="analysisContent"></div>
             </div>
         </div>
@@ -455,7 +455,7 @@ return`
 <div class="investment-header">
 <div>
 <div class="investment-title">${inv.nome}</div>
-<div class="text-sm">${inv.tipologia}</div>
+<div class="text-sm">${inv.tipologia} • ${inv.data_acquisto?new Date(inv.data_acquisto).toLocaleDateString('it-IT'):'N/A'}</div>
 </div>
 <div class="${cls}" style="font-weight:bold;">
 ${formatCurrency(d.valoreAttuale)}
@@ -530,7 +530,7 @@ container.innerHTML=`
 <div class="card__header"><h3>💼 Riepilogo</h3></div>
 <div class="card__body">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-<div><div class="text-sm">Valore</div><div style="font-size:20px;font-weight:bold;">${formatCurrency(totals.valAtt)}</div></div>
+<div><div class="text-sm">Valore Totale</div><div style="font-size:20px;font-weight:bold;">${formatCurrency(totals.valAtt)}</div></div>
 <div><div class="text-sm">Performance</div><div style="font-size:20px;font-weight:bold;" class="${totals.gain>=0?'profit':'loss'}">${formatCurrency(totals.gain)} (${percTotale}%)</div></div>
 </div>
 </div>
@@ -545,7 +545,7 @@ return`<div style="margin-bottom:12px;"><div style="display:flex;justify-content
 </div>
 </div>
 <div class="card mb-16">
-<div class="card__header"><h3>🏆 Top</h3></div>
+<div class="card__header"><h3>🏆 Top Performer</h3></div>
 <div class="card__body">
 <div style="display:flex;justify-content:space-between;">
 <span>${topPerformer.inv.nome}</span>
@@ -554,7 +554,7 @@ return`<div style="margin-bottom:12px;"><div style="display:flex;justify-content
 </div>
 </div>
 <div class="card">
-<div class="card__header"><h3>⚠️ Worst</h3></div>
+<div class="card__header"><h3>⚠️ Worst Performer</h3></div>
 <div class="card__body">
 <div style="display:flex;justify-content:space-between;">
 <span>${worstPerformer.inv.nome}</span>
@@ -688,17 +688,28 @@ const data=await res.json();
 if(data['Global Quote']&&data['Global Quote']['05. price']){
 let price=parseFloat(data['Global Quote']['05. price']);
 
-if(usdToEurRate&&!inv.symbol.toUpperCase().endsWith('.MI')){
+const symbol=inv.symbol.toUpperCase();
+
+const europeanMarkets=['.MI','.PA','.DE','.F','.AS','.BR','.LS','.MC','.VI','.IR','.HE'];
+
+const isEuropeanMarket=europeanMarkets.some(market=>symbol.endsWith(market));
+
+if(!isEuropeanMarket&&usdToEurRate){
 price=price*usdToEurRate;
+console.log(`${inv.nome}: convertito USD→EUR (${usdToEurRate.toFixed(4)})`);
+}else{
+console.log(`${inv.nome}: già in EUR, nessuna conversione`);
 }
 
 inv.prezzo_attuale=Math.round(price*100)/100;
 updated++;
 }else{
+console.warn('Nessun dato per',inv.symbol);
 errors++;
 }
 await new Promise(r=>setTimeout(r,12000));
 }catch(e){
+console.error('Errore:',inv.symbol,e);
 errors++;
 }
 }
@@ -709,7 +720,7 @@ renderInvestments();
 renderManage();
 btn.disabled=false;
 btn.innerHTML='🔄 Aggiorna Prezzi';
-if(updated>0)alert(`✅ ${updated} aggiornati`);
+if(updated>0)alert(`✅ ${updated} prezzi aggiornati!`);
 if(errors>0)alert(`⚠️ ${errors} errori`);
 }
 
@@ -740,7 +751,7 @@ renderManage();
 updateSummary();
 renderInvestments();
 closeModal();
-alert('OK!');
+alert('Aggiornato!');
 }
 };
 }
@@ -753,14 +764,14 @@ function sellInv(id){
 const inv=investments.find(i=>i.id===id);
 if(!inv)return;
 document.getElementById('sellBody').innerHTML=`
-<div class="mb-16"><h4>${inv.nome}</h4></div>
+<div class="mb-16"><h4>${inv.nome}</h4><p class="text-sm">Qtà: ${inv.quantità}</p></div>
 <form id="sellForm">
 <div class="form-group">
-<label class="form-label">Quantità</label>
+<label class="form-label">Quantità da vendere</label>
 <input type="number" class="form-control" id="sellQty" min="0.01" max="${inv.quantità}" step="0.01" required>
 </div>
 <div class="form-group">
-<label class="form-label">Prezzo (€)</label>
+<label class="form-label">Prezzo vendita (€)</label>
 <input type="number" class="form-control" id="sellPrice" value="${inv.prezzo_attuale}" step="0.01" required>
 </div>
 <div class="flex gap-8">
@@ -793,7 +804,7 @@ updateSummary();
 renderInvestments();
 renderHistory();
 closeSellModal();
-alert('OK!');
+alert('Vendita completata!');
 }
 };
 }
@@ -884,7 +895,7 @@ document.getElementById('depositFields').style.display='none';
 renderManage();
 updateSummary();
 renderInvestments();
-alert('Aggiunto!');
+alert('Investimento aggiunto!');
 };
 
 document.addEventListener('DOMContentLoaded',function(){
@@ -897,7 +908,7 @@ updateSummary();
 renderInvestments();
 renderManage();
 renderHistory();
-console.log('✅ App con conversione USD→EUR attiva');
+console.log('✅ App con conversione intelligente valute attiva');
 });
     </script>
 </body>
